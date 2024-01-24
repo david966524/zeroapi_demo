@@ -1,0 +1,57 @@
+syntax = "v1"
+
+// 所有声明仅对当前 service 中的路由有效
+@server (
+	group: login
+	// 定义路由前缀为 "/v1"
+	prefix: /v1
+)
+service user {
+	@handler login
+	post /user/login (LoginReq) returns (LoginResp)
+}
+
+@server (
+	jwt:    Auth
+	group:  user
+	prefix: /v1
+)
+service user {
+	@handler getUserInfo
+	post /user/info (GetUserInfoReq) returns (GetUserInfoResp)
+
+	@handler updateUserInfo
+	post /user/info/update (UpdateUserInfoReq)
+}
+
+type LoginReq {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type LoginResp {
+	Id       int64  `json:"id"`
+	Name     string `json:"name"`
+	Token    string `json:"token"`
+	ExpireAt string `json:"expireAt"`
+}
+
+type (
+	// 定义获取用户信息的 json 请求体
+	GetUserInfoReq {
+		Id int64 `json:"id"`
+	}
+	// 定义获取用户信息的 json 响应体
+	GetUserInfoResp {
+		Id   int64  `json:"id"`
+		Name string `json:"name"`
+		Desc string `json:"desc"`
+	}
+	// 定义更新用户信息的 json 请求体
+	UpdateUserInfoReq {
+		Id   int64  `json:"id"`
+		Name string `json:"name"`
+		Desc string `json:"desc"`
+	}
+)
+
