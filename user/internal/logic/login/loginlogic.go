@@ -3,6 +3,7 @@ package login
 import (
 	"context"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/zeromicro/x/errors"
 	"time"
 
 	"zeroapi_demo/user/internal/svc"
@@ -26,6 +27,10 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 }
 
 func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err error) {
+	// todo: add your logic here and delete this line
+	if req.Username != "david" || req.Password != "123456" {
+		return nil, errors.New(int(PermissionDenied), "用户名密码不对")
+	}
 	// todo: add your logic here and delete this line
 	now := time.Now().Unix()
 	accessToken, err := l.GenToken(now, l.svcCtx.Config.Auth.AccessSecret, nil, l.svcCtx.Config.Auth.AccessExpire)
@@ -53,3 +58,10 @@ func (l *LoginLogic) GenToken(iat int64, secretKey string, payloads map[string]i
 
 	return token.SignedString([]byte(secretKey))
 }
+
+type Code uint32
+
+const (
+	OK               Code = 200
+	PermissionDenied Code = 1001
+)
